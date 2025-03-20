@@ -1,6 +1,15 @@
 # FROM HERE
 # https://stackoverflow.com/questions/70869327/how-to-return-positions-from-ibkr-api-interactive-brokers-consistently
 import threading
+import pandas as pd
+from threading import Thread, Event
+import time
+from typing import Any
+from ibapi.wrapper import EWrapper
+from ibapi.client import EClient
+from ibapi.common import *
+from ibapi.account_summary_tags import AccountSummaryTags
+
 
 class ib_class(EWrapper, EClient): 
     def __init__(self): 
@@ -27,8 +36,10 @@ class ib_class(EWrapper, EClient):
 ib_api = ib_class() 
 ib_api.connect("127.0.0.1", 7496, 0) 
 
+
+# https://qoppac.blogspot.com/2017/03/getting-position-and-accounting-data.html
 ib_api.positions_event.clear() # reset positions_event
-ib_api.reqPositions()
+position_list = ib_api.reqPositions()
 ib_api.positions_event.wait()  # Wait for positions data to come in
 current_positions = ib_api.all_positions
 ib_api.run()
